@@ -60,7 +60,7 @@ def main(argv):
             print("\nModel created in " + str(time.time()-prog_time) + "\n")
 
         joblib.dump(model, "{}".format(createfile))
-        print(information.show_most_informative_features(model))
+        print(information.show_features(model))
 
     elif loadfile:
         try:
