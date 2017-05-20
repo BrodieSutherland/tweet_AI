@@ -55,3 +55,16 @@ def create(tweet, verifiable, minimal, classifier=sklearn.linear_model.SGDClassi
     model.labels_ = labels
 
     return model
+
+def learn(model, tweet, pred_result):
+    correction = input("Is this correct? (y/n) ")
+    if correction == 'y':
+        model.partial_fit(tweet, pred_result, [1,0])
+
+    else:
+        if not pred_result[0]:
+            pred_result[0] = 1
+            model.partial_fit(tweet, pred_result, [1, 0])
+        else:
+            pred_result[0] = 0
+            model.partial_fit(tweet, pred_result, [1, 0])

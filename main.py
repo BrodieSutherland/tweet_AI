@@ -35,7 +35,7 @@ def main(argv):
 
     if (createfile and loadfile) or (not createfile and not loadfile):
         print("Please load OR create a file.")
-        print("For help, try loading with the -h operation.\n")
+        print("For help, try running with the -h operation.\n")
         sys.exit(2)
 
     if createfile:
@@ -71,7 +71,7 @@ def main(argv):
 
     elif loadfile:
         try:
-            model = joblib.load(loadfile.strip(" "))
+            model = joblib.load(loadfile)
         except:
             print("No such file found.\n")
             sys.exit(2)
@@ -92,8 +92,12 @@ def main(argv):
                 else:
                     if input_predict[i][0] > input_predict[i][1]:
                         print(str(twitter_list[i]) + "- Not Verifiable - " + str(input_predict[i][0]) + "% sure")
+                        if learn:
+                            classifier.learn(model, [twitter_list[i]], numpy.array([0], dtype='int64'))
                     else:
                         print(str(twitter_list[i]) + "- Verifiable - " + str(input_predict[i][1]) + "% sure")
+                        if learn:
+                            classifier.learn(model, [twitter_list[i]], numpy.array([1], dtype='int64'))
 
 
 if __name__ == "__main__":
