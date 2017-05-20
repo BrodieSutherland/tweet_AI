@@ -1,4 +1,4 @@
-import sklearn
+import sklearn, glob, io, re
 import language_processor
 from sklearn.pipeline import Pipeline
 
@@ -10,7 +10,7 @@ def this(meme):
 def create(tweet, verifiable, minimal, classifier=sklearn.linear_model.SGDClassifier):
     def build(classifier, tweet, verifiable=None):
         if isinstance(classifier, type):
-            classifier = classifier()
+            classifier = classifier(loss='log')
         model = Pipeline(
             [
                 ('preprocessor',
@@ -30,15 +30,28 @@ def create(tweet, verifiable, minimal, classifier=sklearn.linear_model.SGDClassi
     # Begin evaluating
     if not minimal:
         print("Building")
-    X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(tweet, verifiable, test_size=0.2)
-    model = build(classifier, X_train, y_train)
+    model = build(classifier, tweet, verifiable)
+
+    test_files = glob.glob('test/n/*.txt') + glob.glob('test/y/*.txt')
+    test_data = []
+    test_catagories = []
+    for i in test_files:
+        tmp = i.split('\\')
+        if tmp[0] == 'test/n':
+            test_catagories.append(0)
+        else:
+            test_catagories.append(1)
+        try:
+            test_tweet = io.open('{}/{}'.format(tmp[0], tmp[1]), 'r', encoding='utf8').read()
+        except AttributeError:
+            test_tweet = io.open('{}/{}'.format(tmp[0], tmp[1]), 'r').read()
+        test_data.append(test_tweet)
 
     if not minimal:
         print("Classification Report:\n")
-        y_pred = model.predict(X_test)
-        print(sklearn.metrics.classification_report(y_test, y_pred, target_names=labels.classes_))
+        test_prediction = model.predict(test_data)
+        print(sklearn.metrics.classification_report(test_catagories, test_prediction, target_names=labels.classes_))
 
-    model = build(classifier, tweet, verifiable)
     model.labels_ = labels
 
     return model

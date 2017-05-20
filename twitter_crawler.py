@@ -20,7 +20,7 @@ def crawler(twitter_input):
             return re.sub(r"http\S+", "", api.get_status(twitter_input).text)
     except:
         returnList = []
-        for i in api.user_timeline(twitter_input, count=10):
+        for i in api.user_timeline(twitter_input, count=20):
             try:
                 returnList.append(re.sub(r"http\S+", "", i.retweeted_text))
             except:

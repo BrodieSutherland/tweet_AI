@@ -6,7 +6,7 @@ def main(argv):
     learn = minimal = False
     loadfile = createfile = ''
     try:
-        opts, args = getopt.getopt(argv, "hc:l:", ["createfile=", "loadfile="])
+        opts, args = getopt.getopt(argv, "hmLc:l:", ["createfile=", "loadfile="])
     except getopt.GetoptError:
         print("\nValid Operations:\n-L : Activate learning mode")
         print("-m : Only print valid statements\n-c <file.model> : Build a model from the provided datasets")
@@ -28,10 +28,15 @@ def main(argv):
         elif opt in ('-l', '--loadfile'):
             loadfile = arg
 
-        if (createfile and loadfile) or (not createfile and not loadfile):
-            print("Please load OR create a file.")
-            print("For help, try loading with the -h operation.\n")
-            sys.exit(2)
+    if minimal and learn:
+        print("Minimal mode and Learn mode are not compatible with each other.")
+        print("Please only select one and try again.")
+        sys.exit(2)
+
+    if (createfile and loadfile) or (not createfile and not loadfile):
+        print("Please load OR create a file.")
+        print("For help, try loading with the -h operation.\n")
+        sys.exit(2)
 
     if createfile:
 
@@ -60,7 +65,9 @@ def main(argv):
             print("\nModel created in " + str(time.time()-prog_time) + "\n")
 
         joblib.dump(model, "{}".format(createfile))
-        print(information.show_features(model))
+
+        if not minimal:
+            print(information.show_features(model))
 
     elif loadfile:
         try:
@@ -77,9 +84,16 @@ def main(argv):
         else:
             twitter_list = twitter_crawler.crawler(twitter_input)
             #for i in twitter_list:
-            input_predict = model.predict(twitter_list).tolist()
+            input_predict = model.predict_proba(twitter_list).tolist()
             for i in range(len(twitter_list)):
-                print(str(twitter_list[i]) + "- " + str(input_predict[i]))
+                if minimal:
+                    if input_predict[i][1] > input_predict[i][0]:
+                        print(str(twitter_list[i]))
+                else:
+                    if input_predict[i][0] > input_predict[i][1]:
+                        print(str(twitter_list[i]) + "- Not Verifiable - " + str(input_predict[i][0]) + "% sure")
+                    else:
+                        print(str(twitter_list[i]) + "- Verifiable - " + str(input_predict[i][1]) + "% sure")
 
 
 if __name__ == "__main__":
