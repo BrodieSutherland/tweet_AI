@@ -1,8 +1,13 @@
 # -*- coding: UTF-8 -*-
-import tweepy
-import re
 import io
-import string
+import re
+
+import tweepy
+
+"""
+Quick Script I used to generate train data based on people followed. Might be a bad idea to have these codes up on 
+GitHub but I don't care about my Twitter account.
+"""
 
 # Tweepy configuration details
 consumer_key = 'wPZXlCsAfESR3MIoAxNXed8vV'

@@ -1,5 +1,6 @@
 import glob
 import io
+
 import sklearn
 from sklearn.pipeline import Pipeline
 
@@ -11,20 +12,20 @@ def this(meme):
 
 
 def create(tweet, verifiable, minimal, classifier=sklearn.linear_model.SGDClassifier):
-    def build(classifier, tweet, verifiable=None):
+    def build(classifier, tweet_text, catagory=None):
         if isinstance(classifier, type):
             classifier = classifier(loss='log')
-        model = Pipeline(
+        pipe = Pipeline(
             [
                 ('preprocessor',
-                 language_processor.NLTK_processor()),
+                 language_processor.NLTKProcessor()),
                 ('vectorizer',
                  sklearn.feature_extraction.text.TfidfVectorizer(tokenizer=this, lowercase=False)),
                 ('classifier',
                  classifier),
             ])
-        model.fit(tweet, verifiable)
-        return model
+        pipe.fit(tweet_text, catagory)
+        return pipe
 
     # Label encode the tweets
     labels = sklearn.preprocessing.LabelEncoder()

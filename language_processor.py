@@ -1,10 +1,10 @@
 import string
+
 import nltk
 import sklearn
 
 
-
-class NLTK_processor(sklearn.base.BaseEstimator, sklearn.base.TransformerMixin):
+class NLTKProcessor(sklearn.base.BaseEstimator, sklearn.base.TransformerMixin):
     def __init__(self, stopwords=None, punct=None, lower=True, strip=True):
         self.lower = lower
         self.strip = strip
@@ -12,14 +12,14 @@ class NLTK_processor(sklearn.base.BaseEstimator, sklearn.base.TransformerMixin):
         self.punct = punct or set(string.punctuation)
         self.lemmatizer = nltk.WordNetLemmatizer()
 
-    def fit(self, X, y=None):
-       return self
+    def fit(self, x, y=None):
+        return self
 
-    def inverse_transform(self, X):
-       return [" ".join(doc) for doc in X]
+    def inverse_transform(self, x):
+        return [" ".join(doc) for doc in x]
 
-    def transform(self, X):
-        return [list(self.features(doc)) for doc in X]
+    def transform(self, x):
+        return [list(self.features(doc)) for doc in x]
 
     def features(self, tweet):
         # Break tweet into sentences

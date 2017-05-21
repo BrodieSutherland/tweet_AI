@@ -1,4 +1,5 @@
 import re
+
 import tweepy
 
 # Tweepy configuration details
@@ -15,16 +16,16 @@ api = tweepy.API(authentication)
 def crawler(twitter_input):
     try:
         try:
-            return (re.sub(r"http\S+", "", api.get_status(twitter_input).retweeted_text), twitter_input)
-        except:
-            return (re.sub(r"http\S+", "", api.get_status(twitter_input).text), twitter_input)
+            return re.sub(r"http\S+", "", api.get_status(twitter_input).retweeted_text), twitter_input
+        except AttributeError:
+            return re.sub(r"http\S+", "", api.get_status(twitter_input).text), twitter_input
     except:
-        returnList = []
-        returnIdList = []
+        return_list = []
+        return_id_list = []
         for i in api.user_timeline(twitter_input, count=20):
             try:
-                returnList.append(re.sub(r"http\S+", "", i.retweeted_text))
-            except:
-                returnList.append(re.sub(r"http\S+", "", i.text))
-            returnIdList.append(i.id_str)
-        return (returnList, returnIdList)
+                return_list.append(re.sub(r"http\S+", "", i.retweeted_text))
+            except AttributeError:
+                return_list.append(re.sub(r"http\S+", "", i.text))
+            return_id_list.append(i.id_str)
+        return return_list, return_id_list
