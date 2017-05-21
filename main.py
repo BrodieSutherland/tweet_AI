@@ -1,22 +1,34 @@
+import getopt
+import glob
+import io
+import sys
+import time
+
+import numpy
 from sklearn.externals import joblib
 
 import classifier
-import getopt
-import glob
 import information
-import io
-import numpy
-import sys
-import time
 import twitter_crawler
 
 
-def main(argv):
-    #argv = ["main.py", "-h"]
-    learn = minimal = False
-    loadfile = createfile = ''
+def command_line_operations(operations):
+    '''
+    Parses command line operators, and assigns variables.
+    
+    Keyword Arguments:
+        operations -- a list of arguments parsed via command line
+    
+    Return:
+        A collection of variables assigned as per operations.
+    '''
+    minimal = False
+    learn = False
+    loadfile = ''
+    createfile = ''
+
     try:
-        opts, args = getopt.getopt(argv, "hmLc:l:", ["createfile=", "loadfile="])
+        opts, args = getopt.getopt(operations, "hmLc:l:", ["createfile=", "loadfile="])
     except getopt.GetoptError:
         print("\nValid Operations:\n-L : Activate learning mode")
         print("-m : Only print valid statements\n-c <file.model> : Build a model from the provided datasets")
@@ -47,6 +59,18 @@ def main(argv):
         print("Please load OR create a file.")
         print("For help, try running with the -h operation.\n")
         sys.exit(2)
+
+    return (learn, minimal, loadfile, createfile)
+
+
+def main(argv):
+    '''
+    
+    :param argv: 
+    :return: 
+    '''
+
+    learn, minimal, loadfile, createfile = command_line_operations(argv)
 
     if createfile:
 
