@@ -1,6 +1,9 @@
-import sklearn, glob, io, re
-import language_processor
+import glob
+import io
+import sklearn
 from sklearn.pipeline import Pipeline
+
+import language_processor
 
 
 def this(meme):
@@ -56,15 +59,24 @@ def create(tweet, verifiable, minimal, classifier=sklearn.linear_model.SGDClassi
 
     return model
 
-def learn(model, tweet, pred_result):
+
+def learn(tweet_id, tweet, pred_result):
     correction = input("Is this correct? (y/n) ")
     if correction == 'y':
-        model.partial_fit(tweet, pred_result, [1,0])
-
-    else:
-        if not pred_result[0]:
-            pred_result[0] = 1
-            model.partial_fit(tweet, pred_result, [1, 0])
+        if pred_result[0]:
+            file = io.open("y/{}.txt".format(tweet_id), 'w', encoding='utf8')
+            file.write(tweet)
+            file.close()
         else:
-            pred_result[0] = 0
-            model.partial_fit(tweet, pred_result, [1, 0])
+            file = io.open("n/{}.txt".format(tweet_id), 'w', encoding='utf8')
+            file.write(tweet)
+            file.close()
+    else:
+        if pred_result[0]:
+            file = io.open("n/{}.txt".format(tweet_id), 'w', encoding='utf8')
+            file.write(tweet)
+            file.close()
+        else:
+            file = io.open("y/{}.txt".format(tweet_id), 'w', encoding='utf8')
+            file.write(tweet)
+            file.close()

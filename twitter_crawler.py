@@ -1,4 +1,5 @@
-import tweepy, re
+import re
+import tweepy
 
 # Tweepy configuration details
 consumer_key = 'wPZXlCsAfESR3MIoAxNXed8vV'
@@ -11,18 +12,19 @@ api = tweepy.API(authentication)
 
 
 # Twitter crawler code
-# TODO: Handle Emojis in Twitter Crawler
 def crawler(twitter_input):
     try:
         try:
-            return re.sub(r"http\S+", "", api.get_status(twitter_input).retweeted_text)
+            return (re.sub(r"http\S+", "", api.get_status(twitter_input).retweeted_text), twitter_input)
         except:
-            return re.sub(r"http\S+", "", api.get_status(twitter_input).text)
+            return (re.sub(r"http\S+", "", api.get_status(twitter_input).text), twitter_input)
     except:
         returnList = []
+        returnIdList = []
         for i in api.user_timeline(twitter_input, count=20):
             try:
                 returnList.append(re.sub(r"http\S+", "", i.retweeted_text))
             except:
                 returnList.append(re.sub(r"http\S+", "", i.text))
-        return returnList
+            returnIdList.append(i.id_str)
+        return (returnList, returnIdList)

@@ -1,5 +1,15 @@
-import twitter_crawler, classifier, information, io, getopt, sys, glob, time, numpy
 from sklearn.externals import joblib
+
+import classifier
+import getopt
+import glob
+import information
+import io
+import numpy
+import sys
+import time
+import twitter_crawler
+
 
 def main(argv):
     #argv = ["main.py", "-h"]
@@ -82,22 +92,38 @@ def main(argv):
         if twitter_input == 'exit':
             sys.exit(1)
         else:
-            twitter_list = twitter_crawler.crawler(twitter_input)
+            twitter_list, twitter_id = twitter_crawler.crawler(twitter_input)
             #for i in twitter_list:
-            input_predict = model.predict_proba(twitter_list).tolist()
-            for i in range(len(twitter_list)):
+            if isinstance(twitter_list, str):
+                input_predict = model.predict_proba([twitter_list]).tolist()
                 if minimal:
-                    if input_predict[i][1] > input_predict[i][0]:
-                        print(str(twitter_list[i]))
+                    if input_predict[1] > input_predict[0]:
+                        print(twitter_list)
                 else:
-                    if input_predict[i][0] > input_predict[i][1]:
-                        print(str(twitter_list[i]) + "- Not Verifiable - " + str(input_predict[i][0]) + "% sure")
+                    if input_predict[0][1] > input_predict[0][0]:
+                        print(twitter_list + "- Verifiable - " + str(input_predict[0][1]) + "% sure")
                         if learn:
-                            classifier.learn(model, [twitter_list[i]], numpy.array([0], dtype='int64'))
+                            classifier.learn(twitter_id, twitter_list, numpy.array([1]))
                     else:
-                        print(str(twitter_list[i]) + "- Verifiable - " + str(input_predict[i][1]) + "% sure")
-                        if learn:
-                            classifier.learn(model, [twitter_list[i]], numpy.array([1], dtype='int64'))
+                        if input_predict[0][0] > input_predict[0][1]:
+                            print(twitter_list + "- Not Verifiable - " + str(input_predict[0][0]) + "% sure")
+                            if learn:
+                                classifier.learn(twitter_id, twitter_list, numpy.array([0]))
+            else:
+                for i in range(len(twitter_list)):
+                    input_predict = model.predict_proba(twitter_list).tolist()
+                    if minimal:
+                        if input_predict[i][1] > input_predict[i][0]:
+                            print(str(twitter_list[i]))
+                    else:
+                        if input_predict[i][0] > input_predict[i][1]:
+                            print(str(twitter_list[i]) + "- Not Verifiable - " + str(input_predict[i][0]) + "% sure")
+                            if learn:
+                                classifier.learn(twitter_id[i], twitter_list[i], numpy.array([0], dtype='int64'))
+                        else:
+                            print(str(twitter_list[i]) + "- Verifiable - " + str(input_predict[i][1]) + "% sure")
+                            if learn:
+                                classifier.learn(twitter_id[i], twitter_list[i], numpy.array([1], dtype='int64'))
 
 
 if __name__ == "__main__":
