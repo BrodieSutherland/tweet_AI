@@ -130,8 +130,7 @@ def main(argv):
         twitter_input -- String/handle taken from user input. If it's 'exit', the program ends. Otherwise, handed to
         twitter_crawler to parse tweet(s) from Twitter.
         
-        twitter_list -- List/string based on output from twitter_crawler.crawler. Is a list if twitter_input was a handle,
-        and is a string if twitter_input was a tweet ID. Used in printing output to console. If learn is enabled, it is
+        twitter_list -- List based on output from twitter_crawler.crawler. Used in printing output to console. If learn is enabled, it is
         handed to classifier.learn to be written to file.
          
         twitter_id -- List/string based on output from twitter_crawler.crawler. Contains the ID(s) of tweet(s) returned
@@ -143,6 +142,7 @@ def main(argv):
     """
 
     learn, minimal, loadfile, createfile = command_line_operations(argv)
+    model = None
 
     if createfile:
         model = createmodel(minimal, createfile)
@@ -160,37 +160,25 @@ def main(argv):
         if twitter_input == 'exit':
             sys.exit(1)
         else:
-            twitter_list, twitter_id = twitter_crawler.crawler(twitter_input)
-            if isinstance(twitter_list, str):
-                input_predict = model.predict_proba([twitter_list]).tolist()
+            try:
+                twitter_list, twitter_id = twitter_crawler.crawler(twitter_input)
+            except TypeError:
+                continue
+            for i in range(len(twitter_list)):
+                input_predict = model.predict_proba(twitter_list).tolist()
                 if minimal:
-                    if input_predict[1] > input_predict[0]:
-                        print(twitter_list)
+                    if input_predict[i][1] > input_predict[i][0]:
+                        print(str(twitter_list[i]))
                 else:
-                    if input_predict[0][1] > input_predict[0][0]:
-                        print(twitter_list + "- Verifiable - " + str(input_predict[0][1]) + "% sure")
+                    if input_predict[i][0] > input_predict[i][1]:
+                        print(str(twitter_list[i]) + "- Not Verifiable - " + str(input_predict[i][0]) + "% sure")
                         if learn:
-                            classifier.learn(twitter_id, twitter_list, numpy.array([1]))
+                            classifier.learn(twitter_id[i], twitter_list[i], numpy.array([0], dtype='int64'))
                     else:
-                        if input_predict[0][0] > input_predict[0][1]:
-                            print(twitter_list + "- Not Verifiable - " + str(input_predict[0][0]) + "% sure")
-                            if learn:
-                                classifier.learn(twitter_id, twitter_list, numpy.array([0]))
-            else:
-                for i in range(len(twitter_list)):
-                    input_predict = model.predict_proba(twitter_list).tolist()
-                    if minimal:
-                        if input_predict[i][1] > input_predict[i][0]:
-                            print(str(twitter_list[i]))
-                    else:
-                        if input_predict[i][0] > input_predict[i][1]:
-                            print(str(twitter_list[i]) + "- Not Verifiable - " + str(input_predict[i][0]) + "% sure")
-                            if learn:
-                                classifier.learn(twitter_id[i], twitter_list[i], numpy.array([0], dtype='int64'))
-                        else:
-                            print(str(twitter_list[i]) + "- Verifiable - " + str(input_predict[i][1]) + "% sure")
-                            if learn:
-                                classifier.learn(twitter_id[i], twitter_list[i], numpy.array([1], dtype='int64'))
+                        print(str(twitter_list[i]) + "- Verifiable - " + str(input_predict[i][1]) + "% sure")
+                        if learn:
+                            classifier.learn(twitter_id[i], twitter_list[i], numpy.array([1], dtype='int64'))
+                print('\n')
 
 
 if __name__ == "__main__":
