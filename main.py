@@ -73,7 +73,7 @@ def createmodel(minimal, createfile):
         createfile -- String containing the name of the model to be created.
         
     Return:
-         Nothing, calls other functions, saves the created model to the 'models' directory then ends.
+         model of the classifier, calls other functions, saves the created model to the 'models' directory then ends.
     """
 
     prog_time = time.time()
@@ -104,6 +104,7 @@ def createmodel(minimal, createfile):
     if not minimal:
         print(information.show_features(model))
 
+    return model
 
 def main(argv):
     """
@@ -144,7 +145,7 @@ def main(argv):
     learn, minimal, loadfile, createfile = command_line_operations(argv)
 
     if createfile:
-        createmodel(minimal, createfile)
+        model = createmodel(minimal, createfile)
 
     elif loadfile:
         try:

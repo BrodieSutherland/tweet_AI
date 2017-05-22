@@ -13,6 +13,7 @@ api = tweepy.API(authentication)
 
 
 # Twitter crawler code
+# TODO: Exception for invalid ID/handle
 def crawler(twitter_input):
     try:
         try:
