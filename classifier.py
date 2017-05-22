@@ -14,7 +14,7 @@ def this(meme):
 def create(tweet, verifiable, minimal, classifier=sklearn.linear_model.SGDClassifier):
     """
     This is the function that handles the creation of the classifier itself. After building the function (done within
-    the build function) the classifier is tested against the test files (found in the test folder in the home directory)
+    the build function) the classifier is tested against the american_test files (found in the american_test folder in the home directory)
     A classification report is generated, then the model is returned.
     
     Keyword Arguments:
@@ -24,7 +24,7 @@ def create(tweet, verifiable, minimal, classifier=sklearn.linear_model.SGDClassi
         verifiable -- List, the catagories for all training tweets (in order) are contained within here as strings. This
         list is passed to the build function.
         
-        minimal -- Boolean, passed from the main function, determines whether build and test reports are shown.
+        minimal -- Boolean, passed from the main function, determines whether build and american_test reports are shown.
         
         classifier -- Not called in the main function, this was just here while I tested classifiers
     
@@ -42,13 +42,13 @@ def create(tweet, verifiable, minimal, classifier=sklearn.linear_model.SGDClassi
         print("Building")
     model = build(classifier, tweet, verifiable)
 
-    # Gather test files
-    test_files = glob.glob('test/n/*.txt') + glob.glob('test/y/*.txt')
+    # Gather american_test files
+    test_files = glob.glob('american_test/n/*.txt') + glob.glob('american_test/y/*.txt')
     test_data = []
     test_catagories = []
     for i in test_files:
         tmp = i.split('\\')
-        if tmp[0] == 'test/n':
+        if tmp[0] == 'american_test/n':
             test_catagories.append(0)
         else:
             test_catagories.append(1)
@@ -59,7 +59,7 @@ def create(tweet, verifiable, minimal, classifier=sklearn.linear_model.SGDClassi
         test_data.append(test_tweet)
 
     if not minimal:
-        # Run test function, print a report on the findings
+        # Run american_test function, print a report on the findings
         print("Classification Report:\n")
         test_prediction = model.predict(test_data)
         print(sklearn.metrics.classification_report(test_catagories, test_prediction, target_names=labels.classes_))

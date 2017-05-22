@@ -171,11 +171,11 @@ def main(argv):
                         print(str(twitter_list[i]))
                 else:
                     if input_predict[i][0] > input_predict[i][1]:
-                        print(str(twitter_list[i]) + "- Not Verifiable - " + str(input_predict[i][0]) + "% sure")
+                        print(str(twitter_list[i]) + "- Not Verifiable - " + str(input_predict[i][0] * 100) + "% sure")
                         if learn:
                             classifier.learn(twitter_id[i], twitter_list[i], numpy.array([0], dtype='int64'))
                     else:
-                        print(str(twitter_list[i]) + "- Verifiable - " + str(input_predict[i][1]) + "% sure")
+                        print(str(twitter_list[i]) + "- Verifiable - " + str(input_predict[i][1] * 100) + "% sure")
                         if learn:
                             classifier.learn(twitter_id[i], twitter_list[i], numpy.array([1], dtype='int64'))
                 print('\n')
